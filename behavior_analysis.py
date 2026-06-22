@@ -30,18 +30,18 @@ def _get_scaled_X(detector):
     return detector.scaler.transform(detector.df[feature_cols].values), feature_cols
 
 
-# ---------------------------------------------------------------------------
+# ---------------------
 # Behavioural profiling
-# ---------------------------------------------------------------------------
+# ---------------------
 
 def behavioral_profiling(detector, n_profiles=5):
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("BEHAVIOURAL PROFILING — Traffic Pattern Classification")
-    print("=" * 80)
+    print("=" * 30)
 
     X_scaled, feature_cols = _get_scaled_X(detector)
 
-    print(f"  Creating {n_profiles} behavioural profiles using K-Means…")
+    print(f"  Creating {n_profiles} behavioural profiles using K-Means")
     kmeans   = KMeans(n_clusters=n_profiles, random_state=config.RANDOM_STATE, n_init=10)
     profiles = kmeans.fit_predict(X_scaled)
 
@@ -73,10 +73,9 @@ def behavioral_profiling(detector, n_profiles=5):
 
     return {'profiles': profiles, 'profile_summary': profile_summary, 'n_profiles': n_profiles}
 
-
-# ---------------------------------------------------------------------------
+# ---------------------------------
 # Density-based clustering (DBSCAN)
-# ---------------------------------------------------------------------------
+# ---------------------------------
 
 def _estimate_eps(X_scaled, min_samples):
     """
@@ -137,17 +136,17 @@ def density_based_clustering(detector, min_samples=None):
     }
 
 
-# ---------------------------------------------------------------------------
+# ---------------------
 # Network flow analysis
-# ---------------------------------------------------------------------------
+# ---------------------
 
 def network_flow_analysis(detector):
     """Analyse flow characteristics using engineered ratio features where
     available, since BytesSent/PacketsSent etc. have been log-transformed
     in detector.df and cannot be used for raw ratio arithmetic."""
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("NETWORK FLOW ANALYSIS")
-    print("=" * 80)
+    print("-" * 30)
 
     feature_cols = detector._get_feature_columns()
     flow_stats   = {}
@@ -193,15 +192,14 @@ def network_flow_analysis(detector):
     _plot_flow_analysis(detector, flow_stats, feature_cols)
     return flow_stats
 
-
-# ---------------------------------------------------------------------------
+# ------------------------
 # Anomaly severity scoring
-# ---------------------------------------------------------------------------
+# ------------------------
 
 def anomaly_severity_scoring(detector):
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("ANOMALY SEVERITY SCORING")
-    print("=" * 80)
+    print("-" * 30)
 
     X_all, _ = _get_scaled_X(detector)   # full dataset, consistent with other analyses
     scores    = []
@@ -219,7 +217,7 @@ def anomaly_severity_scoring(detector):
             pass
 
     if not scores:
-        print("  No trained models available for severity scoring")
+        print("No trained models available for severity scoring")
         return None
 
     combined = np.mean(scores, axis=0)
@@ -249,10 +247,9 @@ def anomaly_severity_scoring(detector):
         'distribution': sev_counts,
     }
 
-
-# ---------------------------------------------------------------------------
+# -----
 # Plots
-# ---------------------------------------------------------------------------
+# -----
 
 def _plot_behavioral_profiles(detector, profiles, profile_summary, n_profiles, X_scaled):
     plt.figure(figsize=(20, 12))
@@ -598,24 +595,23 @@ def _plot_severity_analysis(detector, severity_scores, severity_levels):
     print(f"\n  Severity analysis saved to '{output_path}'")
     plt.close()
 
-
-# ---------------------------------------------------------------------------
+# -----------
 # Entry point
-# ---------------------------------------------------------------------------
+# -----------
 
 def run_behavior_analysis(detector):
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("BEHAVIOURAL ANALYSIS SUITE")
-    print("=" * 80)
+    print("-" * 30)
 
     profiles         = behavioral_profiling(detector, n_profiles=config.BEHAVIOR_N_PROFILES)
     density_results  = density_based_clustering(detector)
     flow_stats       = network_flow_analysis(detector)
     severity_results = anomaly_severity_scoring(detector)
 
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("BEHAVIOURAL ANALYSIS COMPLETE")
-    print("=" * 80)
+    print("-" * 30)
 
     return {
         'profiles': profiles,
