@@ -18,10 +18,9 @@ import config
 import warnings
 warnings.filterwarnings('ignore')
 
-
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
 # Autoencoder anomaly detection (MLPRegressor, trains on normal only)
-# ---------------------------------------------------------------------------
+# -------------------------------------------------------------------
 
 def autoencoder_anomaly_detection(detector):
     """
@@ -31,9 +30,9 @@ def autoencoder_anomaly_detection(detector):
     Trained exclusively on normal traffic so anomalous flows produce high
     reconstruction error — they don't fit the patterns the network learned.
     """
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("AUTOENCODER ANOMALY DETECTION")
-    print("=" * 80)
+    print("-" * 30)
     print("\nSDN Application:")
     print("  • Unsupervised detection of novel attack patterns")
     print("  • No labels required at deployment time")
@@ -47,7 +46,7 @@ def autoencoder_anomaly_detection(detector):
     n_features = X_train.shape[1]
     hidden     = (16, 8, config.AE_BOTTLENECK, 8, 16)
 
-    # Train ONLY on normal flows — core of reconstruction-based detection
+    # Train only on normal flows — core of reconstruction-based detection
     if y_train is not None:
         normal_mask  = y_train == 0
         X_train_norm = X_train[normal_mask]
@@ -134,9 +133,9 @@ def _print_metrics(label, y_true, y_pred, scores):
     print(f"    Avg Prec  : {average_precision_score(y_true, scores):.4f}")
 
 
-# ---------------------------------------------------------------------------
+# -----
 # Plots
-# ---------------------------------------------------------------------------
+# -----
 
 def _plot_autoencoder_results(detector, train_errors, test_errors, y_test,
                                y_pred, threshold, loss_curve, attribution):
@@ -250,14 +249,14 @@ def _plot_autoencoder_results(detector, train_errors, test_errors, y_test,
     plt.close()
 
 
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------
 # Ensemble: Autoencoder + Isolation Forest + Random Forest
-# ---------------------------------------------------------------------------
+# --------------------------------------------------------
 
 def ensemble_anomaly_detection(detector, ae_pred, ae_errors):
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("ENSEMBLE ANOMALY DETECTION — WEIGHTED VOTING")
-    print("=" * 80)
+    print("-" * 30)
 
     X_train = detector.X_train
     X_test  = detector.X_test
@@ -357,7 +356,6 @@ def ensemble_anomaly_detection(detector, ae_pred, ae_errors):
         'model_predictions': all_pred,
         'weights': weights,
     }
-
 
 def _plot_ensemble_results(detector, all_pred, all_scores, ensemble_pred,
                            ensemble_score, confidence, weights, optimal_thresh, y_test):
@@ -495,24 +493,23 @@ def _plot_ensemble_results(detector, all_pred, all_scores, ensemble_pred,
     print(f"\n  Ensemble results saved to '{output_path}'")
     plt.close()
 
-
-# ---------------------------------------------------------------------------
+# -----------
 # Entry point
-# ---------------------------------------------------------------------------
+# -----------
 
 def run_deep_learning_analysis(detector):
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("DEEP LEARNING — AUTOENCODER ANALYSIS")
-    print("=" * 80)
+    print("-" * 30)
 
     t0 = time.time()
     results = autoencoder_anomaly_detection(detector)
     ae_time = time.time() - t0
     print(f"\n  Autoencoder training time : {ae_time:.1f}s")
 
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("ENSEMBLE ANALYSIS")
-    print("=" * 80)
+    print("-" * 30)
 
     t0 = time.time()
     ensemble_results = ensemble_anomaly_detection(
@@ -522,9 +519,9 @@ def run_deep_learning_analysis(detector):
     )
     ens_time = time.time() - t0
 
-    print("\n" + "=" * 80)
+    print("\n" + "-" * 30)
     print("DEEP LEARNING ANALYSIS COMPLETE")
-    print("=" * 80)
+    print("-" * 30)
     print(f"\n  Autoencoder training time : {ae_time:.1f}s")
     print(f"  Ensemble training time    : {ens_time:.1f}s")
     print(f"  Deep Learning total       : {ae_time + ens_time:.1f}s")
